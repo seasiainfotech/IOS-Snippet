@@ -1,0 +1,55 @@
+//
+//  CustomSwitch.swift
+//
+//  Created by Akash Dhiman on 20/05/21.
+//
+
+import UIKit
+import BetterSegmentedControl
+
+@objc protocol CustomSwitchProtocol {
+    func switchValueChange(_ sender: BetterSegmentedControl)
+}
+
+@IBDesignable
+class CustomSwitch: UIView {
+    
+    @IBOutlet var delegate: CustomSwitchProtocol?
+    let borderColor = UIColor(red: 0.212, green: 0.216, blue: 0.243, alpha: 1)
+    let corner : CGFloat = 4.0
+    let segmentIndicatorBorder : CGFloat = 3.0
+    let bgViewBorder : CGFloat = 2.0
+    var setIndexOfIndex = 0
+    
+    @IBInspectable var title1: String = ""
+    @IBInspectable var title2: String = ""
+    @IBInspectable var viewTag: Int = 0
+    
+    override func draw(_ rect: CGRect) {        
+        let navigationSegmentedControl = BetterSegmentedControl(
+            frame: CGRect(x: 0, y: 0, width: self.frame.size.width, height: self.frame.size.height),
+            segments: LabelSegment.segments(withTitles: [title1, title2],
+                                            normalTextColor: borderColor,
+                                            selectedTextColor: .white),
+            options:[.backgroundColor(.clear),
+                     .indicatorViewBackgroundColor(borderColor),
+                     .cornerRadius(corner),
+                     .indicatorViewBorderWidth(segmentIndicatorBorder),
+                     .indicatorViewBorderColor(UIColor(red: 0.09, green: 0.1, blue: 0.15, alpha: 1)),
+                     .animationSpringDamping(1.0)])
+        navigationSegmentedControl.addTarget(self,
+                                             action: #selector(navigationSegmentedControlValueChanged(_:)),
+                                             for: .valueChanged)
+        navigationSegmentedControl.setIndex(setIndexOfIndex)
+        navigationSegmentedControl.layer.cornerRadius = corner
+        navigationSegmentedControl.layer.borderWidth = bgViewBorder
+        navigationSegmentedControl.layer.borderColor = borderColor.cgColor
+        navigationSegmentedControl.tag = viewTag
+        self.addSubview(navigationSegmentedControl)
+    }
+    
+    // MARK: - Action handlers
+    @objc func navigationSegmentedControlValueChanged(_ sender: BetterSegmentedControl) {
+        delegate?.switchValueChange(sender)
+    }
+}

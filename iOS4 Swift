@@ -1,0 +1,55 @@
+//
+//  CustomTextField.swift
+//
+//  Created by Akash Dhiman on 06/01/21.
+//  Copyright © 2021 Akash Dhiman. All rights reserved.
+//
+
+import UIKit
+
+class CustomTextField: UITextField, UITextFieldDelegate {
+
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)!
+        delegate = self
+    }
+    required override init(frame: CGRect) {
+        super.init(frame: frame)
+        delegate = self
+    }
+    
+    override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if action == #selector(UIResponderStandardEditActions.paste(_:)) {
+            return false
+        }
+        return super.canPerformAction(action, withSender: sender)
+    }
+
+    func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        guard let oldText = textField.text, let r = Range(range, in: oldText) else {
+            return true
+        }
+        
+        let newText = oldText.replacingCharacters(in: r, with: string)
+        if let newValue = Double(newText) {
+            if 99.999 > 0 && newValue > 99.999 {
+                return false
+            }
+        }
+        let isNumeric = newText.isEmpty || (Double(newText) != nil)
+        let numberOfDots = newText.components(separatedBy: ".").count - 1
+
+        let numberOfDecimalDigits: Int
+        if let dotIndex = newText.firstIndex(of: ".") {
+            numberOfDecimalDigits = newText.distance(from: dotIndex, to: newText.endIndex) - 1
+        } else {
+            numberOfDecimalDigits = 0
+        }
+
+        return isNumeric && numberOfDots <= 1 && numberOfDecimalDigits <= 3
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        
+    }
+}

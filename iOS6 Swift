@@ -1,0 +1,156 @@
+//
+//  ADTwoWaySlider.swift
+//
+//  Created by Akash Dhiman on 24/02/21.
+//  Copyright © 2021 Akash Dhiman. All rights reserved.
+//
+
+import Foundation
+import UIKit
+
+  public class ADTwoWaySlider: UIControl {
+    
+    var sliderRange: CGFloat = 1 {
+        didSet {
+            setNeedsDisplay()
+        }
+    }
+    var completion:((_ value:CGFloat)->Void)?
+    
+    public var currentValue: CGFloat = 0.0
+    
+    // MARK: - Private Properties
+    private let thumbSize: CGFloat = 16
+    private var margin: CGFloat { return (thumbSize * 0.5) + 2}
+    private var touchStart: CGPoint = .zero
+    private let lineWidth: CGFloat =  6
+    
+    /// Label to display above the thumb
+    let thumbImage = UIImageView()
+    let bgLayer = CAShapeLayer()
+    let sliderbgLayer = CAShapeLayer()
+    
+    var sliderValue: CGFloat = 0.1 {
+        didSet {
+            currentValue = sliderValue - 0.5
+            setNeedsDisplay()
+        }
+    }
+
+    /// Draw the elements of the slider to be displayed
+    public override func draw(_ rect: CGRect) {
+        
+        let halfBoundsHeight: CGFloat = bounds.height * 0.5
+        let halfBoundsWidth: CGFloat = bounds.width * 0.5
+        let widthMargins: CGFloat = margin * 2
+        roundSliderValue()
+        
+        /// Variable Declarations
+        let circleOffset: CGFloat = sliderValue * (bounds.width - widthMargins) + 2
+        let bezierEndpoint: CGFloat = sliderValue * (bounds.width - widthMargins) + margin
+        
+        bgLayer.frame = self.bounds
+        bgLayer.backgroundColor =  UIColor(red: 0.263, green: 0.255, blue: 0.282, alpha: 1).cgColor
+        layer.insertSublayer(bgLayer, at: 0)
+        
+        let myImage = UIImage(named: "two_way_slider_bg")?.cgImage
+        sliderbgLayer.frame = CGRect(x: (bounds.width/2) - 139, y: bounds.height/2 - 3, width: 278, height: 6)
+            //CGRect(x: 20, y: bounds.height/2 - 3, width: bounds.size.width-40, height: 6) // 139 //278
+        sliderbgLayer.contents = myImage
+        bgLayer.mask = sliderbgLayer
+        
+        /// Line Drawing
+        let linePath = UIBezierPath()
+        linePath.move(to: CGPoint(x: halfBoundsWidth, y: halfBoundsHeight))
+        linePath.addLine(to: CGPoint(x: bezierEndpoint, y: halfBoundsHeight))
+        bgLayer.path = linePath.cgPath
+        bgLayer.lineWidth = lineWidth
+        bgLayer.strokeColor = setColor().cgColor
+        bgLayer.fillColor = setColor().cgColor
+        
+        thumbImage.backgroundColor = .white
+        thumbImage.layer.cornerRadius = thumbSize/2
+        thumbImage.frame = CGRect(x: circleOffset, y: (halfBoundsHeight) - (thumbSize * 0.5), width: thumbSize, height: thumbSize)
+        addSubview(thumbImage)
+    }
+    
+    public override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let loc = touches.first?.location(in: self) else { return }
+        touchStart = loc
+        update(loc, touch: touches.first!)
+    }
+    
+    public override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let loc = touches.first?.location(in: self) else { return }
+        update(loc, touch: touches.first!)
+    }
+    
+    public override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let loc = touches.first?.location(in: self) else { return }
+        update(loc, touch: touches.first!)
+    }
+    
+    public override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let loc = touches.first?.location(in: self) else { return }
+        update(loc, touch: touches.first!)
+    }
+    
+    init(sliderRange: CGFloat) {
+        super.init(frame: .zero)
+        self.sliderRange = sliderRange
+        setup()
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)!
+        
+    }
+    
+    required override init(frame: CGRect) {
+        super.init(frame: frame)
+    }
+}
+
+// MARK: - Private Extension
+
+private extension ADTwoWaySlider {
+    
+    func setup() {
+        backgroundColor = .clear
+    }
+    
+    func update(_ location: CGPoint,touch:UITouch) {
+        sliderValue = max(min((location.x - margin) / (bounds.width - (margin)), 1), 0)
+        print(sliderValue)
+        
+        currentValue = sliderValue - 0.5
+        sendActions(for: .valueChanged)
+        
+        let halfBoundsHeight: CGFloat = bounds.height * 0.5
+        let widthMargins: CGFloat = margin * 2
+        let circleOffset: CGFloat = sliderValue * (bounds.width - widthMargins) + 2
+        thumbImage.frame = CGRect(x: circleOffset, y: (halfBoundsHeight) - (thumbSize * 0.5), width: thumbSize, height: thumbSize)
+        completion?(currentValue)
+    }
+    
+    func roundSliderValue() {
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 1
+        formatter.minimumFractionDigits = 1
+        let value = currentValue * sliderRange
+        if let formattedString = formatter.string(for: value) {
+            print("roundSliderValue",formattedString)
+        }
+    }
+    
+    func setColor() -> UIColor {
+        switch currentValue {
+        case let x where x < 0:
+            return UIColor(red: 0.075, green: 0.851, blue: 0.933, alpha: 1)
+        case let x where x > 0:
+            return UIColor(red: 0.498, green: 0.047, blue: 0.898, alpha: 1)
+        default:
+            return UIColor.lightGray
+        }
+    }
+}

@@ -1,0 +1,75 @@
+//
+//  Device.swift
+//
+//  Created by Akash Dhiman on 20/05/20.
+//  Copyright © 2020 Akash Dhiman. All rights reserved.
+//
+
+import Foundation
+
+import UIKit
+
+enum DeviceType {
+    case iphone6
+    case iphone6Plus
+    case iphoneX
+    case iphoneXSMax
+    case iphoneXR
+    case unknown
+}
+
+class Device {
+    static var isPortraite: Bool {
+        if UIScreen.main.bounds.width > UIScreen.main.bounds.height {
+            // Landscape
+            return false
+        } else {
+            // portrait
+            return true
+        }
+    }
+    
+    static func device() -> DeviceType {
+        if UIDevice().userInterfaceIdiom == .phone {
+            switch UIScreen.main.nativeBounds.height {
+//            case 1136:
+//                return .iphone5
+            case 1334:
+                return .iphone6
+            case 1920, 2208:
+                return .iphone6Plus
+            case 2436:
+               return .iphoneX
+            case 2688:
+                return .iphoneXSMax
+            case 1792:
+               return .iphoneXR
+            default:
+                return .unknown
+            }
+        } else {
+            return .unknown
+        }
+    }
+    
+    static func portraiteWidth() -> CGFloat {
+        if UIScreen.main.bounds.width > UIScreen.main.bounds.height {
+            // Landscape
+            return UIScreen.main.bounds.height
+        } else {
+            // portrait
+            return UIScreen.main.bounds.width
+        }
+    }
+}
+extension UIDevice {
+    var hasNotch: Bool {
+        guard #available(iOS 11.0, *), let window = UIApplication.shared.keyWindow else { return false }
+        let orientation = UIApplication.shared.statusBarOrientation
+        if orientation.isPortrait {
+            return window.safeAreaInsets.top >= 44
+        } else {
+            return window.safeAreaInsets.left > 0 || window.safeAreaInsets.right > 0
+        }
+    }
+}
