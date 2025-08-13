@@ -1,9 +1,3 @@
-//
-//  CustomSwitch.swift
-//
-//  Created by Akash Dhiman on 20/05/21.
-//
-
 import UIKit
 import BetterSegmentedControl
 
