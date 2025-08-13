@@ -1,11 +1,4 @@
-    //
-    //  Bearing.swift
-    //  SampleLocation
-    //
-    //  Created by Akash Dhiman on 14/12/20.
-    //
-    
-    import CoreLocation
+import CoreLocation
     
     class Bearing: NSObject {
         
