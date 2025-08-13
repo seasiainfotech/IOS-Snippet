@@ -1,11 +1,3 @@
-//
-//  ADSlider.swift
-//  CustomProgressBar
-//
-//  Created by Akash Dhiman on 13/10/20.
-//  Copyright © 2020 Akash Dhiman. All rights reserved.
-//
-
 import UIKit
 
 class ADSlider: UISlider {
