@@ -1,10 +1,3 @@
-//
-//  User.swift
-//  Snippet
-//
-//  Created by Akash on 13/08/25.
-//
-
 import Foundation
 
 /// Represents a user in the application
